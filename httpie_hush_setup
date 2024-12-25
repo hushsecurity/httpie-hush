@@ -1,0 +1,47 @@
+#!/usr/bin/python3
+import getpass
+import json
+import os
+import sys
+
+IS_WINDOWS = "win32" in str(sys.platform).lower()
+CONF_DIR = str(
+    os.getenv(
+        "HTTPIE_CONFIG_DIR",
+        os.path.expanduser("~/.httpie" if not IS_WINDOWS else r"%APPDATA%\\httpie"),
+    )
+)
+CONF_PATH = os.path.join(CONF_DIR, "config.json")
+PROMPT = ">> "
+
+if __name__ == "__main__":
+    print("Welcome to Hush's HTTPie setup")
+
+    auth_arguments = []
+    print("Please enter your Hush login username (email address) or API key ID:")
+    username = input(PROMPT)
+    if "@" in username:
+        is_api_key = False
+    elif "key-" in username:
+        is_api_key = True
+    else:
+        print("httpie-hush error: invalid username or API key ID format")
+        exit(1)
+    auth_arguments.append(username)
+
+    msg = "API Key secret" if is_api_key else "login password"
+    print(f"Please enter your Hush {msg}:")
+    auth_arguments.append(getpass.getpass(PROMPT))
+
+    if not is_api_key:
+        print("Please enter your organization's shortname")
+        auth_arguments.append(input(PROMPT))
+
+    conf = {"default_options": [f"--auth={':'.join(auth_arguments)}"]}
+    if not os.path.exists(CONF_DIR):
+        os.makedirs(CONF_DIR)
+    with open(CONF_PATH, "w") as f:
+        json.dump(conf, f, indent=4)
+        f.write("\n")
+
+    print("Updated %s successfully" % CONF_PATH)
