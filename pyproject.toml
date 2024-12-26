@@ -9,6 +9,11 @@ readme = "README.md"
 python = "^3.12"
 httpie = "^3.2.4"
 
+[tool.poetry.group.ci]
+optional = true
+
+[tool.poetry.group.ci.dependencies]
+pylint = "^3.2.7"
 
 [build-system]
 requires = ["poetry-core"]
