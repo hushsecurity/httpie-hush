@@ -23,6 +23,7 @@ __licence__ = "Apache 2.0"
 # APIs
 LOGIN_API = "/v1/authn/login"
 GRANT_TOKEN_API = "/v1/oauth/token"
+VERIFY_FACTOR_API = "/v1/authn/factors/verify"
 
 
 class HushAuth(object):
@@ -66,8 +67,15 @@ class HushAuth(object):
             "password": self.password,
         }
         response = self._call(LOGIN_API, "post", body=body)
+        if response["status"] == "mfa_required":
+            print("MFA Required, please enter OTP")
+            otp = input(">> ")
+            body = {"factor": "software_totp", "otp": otp}
+            headers = {"Authorization": f"Bearer {response["token"]}"}
+            response = self._call(VERIFY_FACTOR_API, "post", body=body, headers=headers)
+
         if response["status"] != "success":
-            raise Exception("Could not log in. Returned status: %s", response["status"])
+            raise Exception(f"Could not log in. Returned status: {response['status']}")
 
         data = {
             "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
