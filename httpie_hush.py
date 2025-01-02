@@ -162,7 +162,7 @@ class HushAuthPlugin(AuthPlugin):
     auth_require = False
 
     def get_auth(self, username=None, password=None):
-        parts = self.raw_auth.split(":")
+        parts = self.raw_auth.split(":") if self.raw_auth else []
         if not 2 <= len(parts) <= 4:
             print("Invalid auth arguments provided")
             sys.exit(ExitStatus.PLUGIN_ERROR)
