@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "httpie-hush"
-version = "0.1"
+version = "1.0"
 description = "Hush OAuth 2 plugin for the HTTPie command line HTTP client"
 authors = ["Gilad Sever <gilad9366@gmail.com>"]
 readme = "README.md"
