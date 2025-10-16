@@ -71,7 +71,7 @@ class HushAuth(object):
             print("MFA Required, please enter OTP")
             otp = input(">> ")
             body = {"factor": "software_totp", "otp": otp}
-            headers = {"Authorization": f"Bearer {response["token"]}"}
+            headers = {"Authorization": f"Bearer {response['token']}"}
             response = self._call(VERIFY_FACTOR_API, "post", body=body, headers=headers)
 
         if response["status"] != "success":
@@ -187,5 +187,5 @@ class HushAuthPlugin(AuthPlugin):
     def _verify_input(**input_params):
         missing = [k for k, v in input_params.items() if not v]
         if missing:
-            print(f"httpie-hush error: missing {", ".join(missing)}", file=sys.stderr)
+            print(f"httpie-hush error: missing {', '.join(missing)}", file=sys.stderr)
             sys.exit(ExitStatus.PLUGIN_ERROR)
