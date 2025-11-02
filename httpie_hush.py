@@ -16,7 +16,7 @@ from httpie.plugins import AuthPlugin
 from httpie.status import ExitStatus
 from requests.auth import HTTPBasicAuth
 
-__version__ = "1.1"
+__version__ = "1.2"
 __author__ = "Gilad Sever"
 __licence__ = "Apache 2.0"
 
