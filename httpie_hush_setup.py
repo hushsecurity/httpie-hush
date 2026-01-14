@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 import getpass
 import json
 import os
@@ -14,7 +14,8 @@ CONF_DIR = str(
 CONF_PATH = os.path.join(CONF_DIR, "config.json")
 PROMPT = ">> "
 
-if __name__ == "__main__":
+
+def main():
     print("Welcome to Hush's HTTPie setup")
 
     auth_arguments = []
@@ -45,3 +46,7 @@ if __name__ == "__main__":
         f.write("\n")
 
     print("Updated %s successfully" % CONF_PATH)
+
+
+if __name__ == "__main__":
+    main()
