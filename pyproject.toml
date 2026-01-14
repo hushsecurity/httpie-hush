@@ -19,5 +19,8 @@ pylint = "^3.2.7"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.poetry.scripts]
+httpie-hush-setup = "httpie_hush_setup:main"
+
 [tool.poetry.plugins."httpie.plugins.auth.v1"]
 httpie_hush = "httpie_hush:HushAuthPlugin"
