@@ -19,19 +19,14 @@ You should now see `hush` under `--auth-type` in `$ http --help` output.
 httpie-hush-setup
 ```
 
-Configure Hush's auth plugin with your creds (saved in `~/.httpie/config.json`).  
-The credentials can be either a username/password or an API Key ID/API Key Secret.
+Configure Hush's auth plugin with your API Key credentials (saved in `~/.httpie/config.json`).
 
 #### Notes:
-- If username is not provided in conf file it will be searched at
-  `HTTPIE_HUSH_USERNAME` envar
-- If password is not provided in conf file it will be searched at
-  `HTTPIE_HUSH_PASSWORD` envar
-- If org shortname is not provided in conf file it will be searched at
-  `HTTPIE_HUSH_ORG` envar
-  - Only required for username login
-  - API Keys use the API Key's org or the passes effective org
-- Manually inputted username/password supersedes conf file and environment variables
+- If API Key ID is not provided in conf file it will be searched at
+  `HTTPIE_HUSH_API_KEY_ID` envar
+- If API Key Secret is not provided in conf file it will be searched at
+  `HTTPIE_HUSH_API_KEY_SECRET` envar
+- Manually inputted credentials supersede conf file and environment variables
 
 
 ## Usage

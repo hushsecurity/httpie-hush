@@ -18,27 +18,16 @@ PROMPT = ">> "
 def main():
     print("Welcome to Hush's HTTPie setup")
 
-    auth_arguments = []
-    print("Please enter your Hush login username (email address) or API key ID:")
-    username = input(PROMPT)
-    if "@" in username:
-        is_api_key = False
-    elif "key-" in username:
-        is_api_key = True
-    else:
-        print("httpie-hush error: invalid username or API key ID format")
-        exit(1)
-    auth_arguments.append(username)
+    print("Please enter your Hush API Key ID:")
+    api_key_id = input(PROMPT)
+    if not api_key_id.startswith("key-"):
+        print("httpie-hush error: invalid API Key ID format (should start with 'key-')")
+        sys.exit(1)
 
-    msg = "API Key secret" if is_api_key else "login password"
-    print(f"Please enter your Hush {msg}:")
-    auth_arguments.append(getpass.getpass(PROMPT))
+    print("Please enter your Hush API Key Secret:")
+    api_key_secret = getpass.getpass(PROMPT)
 
-    if not is_api_key:
-        print("Please enter your organization's shortname")
-        auth_arguments.append(input(PROMPT))
-
-    conf = {"default_options": [f"--auth={':'.join(auth_arguments)}"]}
+    conf = {"default_options": [f"--auth={api_key_id}:{api_key_secret}"]}
     if not os.path.exists(CONF_DIR):
         os.makedirs(CONF_DIR)
     with open(CONF_PATH, "w") as f:
