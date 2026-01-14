@@ -21,16 +21,13 @@ __author__ = "Gilad Sever"
 __licence__ = "Apache 2.0"
 
 # APIs
-LOGIN_API = "/v1/authn/login"
 GRANT_TOKEN_API = "/v1/oauth/token"
-VERIFY_FACTOR_API = "/v1/authn/factors/verify"
 
 
 class HushAuth(object):
-    def __init__(self, username, password, org, eorg):
-        self.username = username
-        self.password = password
-        self.org = org
+    def __init__(self, api_key_id, api_key_secret, eorg):
+        self.api_key_id = api_key_id
+        self.api_key_secret = api_key_secret
         self.eorg = eorg
         self.verbose = bool(os.getenv("VERBOSE", False))
         self.host_url = None
@@ -48,42 +45,11 @@ class HushAuth(object):
         return r
 
     def _get_token(self):
-        if self.username.startswith("key-") and "@" not in self.username:
-            return self._get_api_key_token()
-        else:
-            return self._get_user_token()
-
-    def _get_api_key_token(self):
         data = {"grant_type": "client_credentials"}
-        auth = HTTPBasicAuth(self.username, self.password)
+        auth = HTTPBasicAuth(self.api_key_id, self.api_key_secret)
         if self.eorg:
             data["effective_org"] = self.eorg
         return self._call(GRANT_TOKEN_API, "post", data=data, auth=auth)
-
-    def _get_user_token(self):
-        body = {
-            "org_shortname": self.org,
-            "username": self.username,
-            "password": self.password,
-        }
-        response = self._call(LOGIN_API, "post", body=body)
-        if response["status"] == "mfa_required":
-            print("MFA Required, please enter OTP")
-            otp = input(">> ")
-            body = {"factor": "software_totp", "otp": otp}
-            headers = {"Authorization": f"Bearer {response['token']}"}
-            response = self._call(VERIFY_FACTOR_API, "post", body=body, headers=headers)
-
-        if response["status"] != "success":
-            raise Exception(f"Could not log in. Returned status: {response['status']}")
-
-        data = {
-            "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
-            "assertion": response["token"],
-        }
-        if self.eorg and self.eorg != self.org:
-            data["effective_org"] = self.eorg
-        return self._call(GRANT_TOKEN_API, "post", data=data)
 
     def _is_token_endpoint_exists(self):
         url = self.host_url + GRANT_TOKEN_API
@@ -155,8 +121,7 @@ class HushAuth(object):
     def _get_token_path(self):
         tmpdir = tempfile.gettempdir()
         eorg = f"{self.eorg}." if self.eorg else ""
-        org = f"{self.org}." if self.org else ""
-        return os.path.join(tmpdir, f"httpie-hush.{eorg}{org}{self.username}")
+        return os.path.join(tmpdir, f"httpie-hush.{eorg}{self.api_key_id}")
 
     def _vprint(self, msg):
         if self.verbose:
@@ -170,18 +135,19 @@ class HushAuthPlugin(AuthPlugin):
     auth_require = False
 
     def get_auth(self, username=None, password=None):
+        # Note: username/password params are required by HTTPie's plugin interface
+        # but we use them as api_key_id/api_key_secret
         parts = self.raw_auth.split(":") if self.raw_auth else ["", ""]
-        if not 2 <= len(parts) <= 4:
+        if not 2 <= len(parts) <= 3:
             print("Invalid auth arguments provided")
             sys.exit(ExitStatus.PLUGIN_ERROR)
 
-        username = parts[0] or username or os.getenv("HTTPIE_HUSH_USERNAME")
-        password = parts[1] or password or os.getenv("HTTPIE_HUSH_PASSWORD")
-        org = parts[2] if len(parts) > 2 else os.getenv("HTTPIE_HUSH_ORG")
-        eorg = parts[3] if len(parts) > 3 else os.getenv("EORG")
+        api_key_id = parts[0] or username or os.getenv("HTTPIE_HUSH_API_KEY_ID")
+        api_key_secret = parts[1] or password or os.getenv("HTTPIE_HUSH_API_KEY_SECRET")
+        eorg = parts[2] if len(parts) > 2 else os.getenv("EORG")
 
-        self._verify_input(username=username, password=password)
-        return HushAuth(username, password, org, eorg)
+        self._verify_input(api_key_id=api_key_id, api_key_secret=api_key_secret)
+        return HushAuth(api_key_id, api_key_secret, eorg)
 
     @staticmethod
     def _verify_input(**input_params):
