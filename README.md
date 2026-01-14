@@ -6,8 +6,8 @@ Hush OAuth 2 plugin for the `HTTPie <https://github.com/jkbr/httpie>` command li
 ## Installation
 
 ```bash
-    $ pipx install httpie
-    $ pipx inject httpie httpie-hush
+pipx install httpie
+pipx inject httpie httpie-hush
 ```
 
 You should now see `hush` under `--auth-type` in `$ http --help` output.
@@ -16,7 +16,7 @@ You should now see `hush` under `--auth-type` in `$ http --help` output.
 ## Setup
 
 ```bash
-    $ httpie-hush-setup
+httpie-hush-setup
 ```
 
 Configure Hush's auth plugin with your creds (saved in `~/.httpie/config.json`).  
@@ -37,12 +37,12 @@ The credentials can be either a username/password or an API Key ID/API Key Secre
 ## Usage
 
 ```bash
-    $ http --auth-type=hush GET https://api.us.hush-security.com/v1/users
+http --auth-type=hush GET https://api.us.hush-security.com/v1/users
 ```
 
 It's possible to use an effective org by passing the ``EORG`` envar:
 
 ```bash
-    $ EORG=hush http --auth-type=hush GET https://api.us.hush-security.com/v1/users
+EORG=hush http --auth-type=hush GET https://api.us.hush-security.com/v1/users
 ```
 
